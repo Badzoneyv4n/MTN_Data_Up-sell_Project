@@ -1,26 +1,47 @@
-def recommend_mtn_offer(row):
-    if row['user_segment'] == 'non':
-        if row['recharge_growth'] < 2000:
-            return 'MTN Learn'
-        else:
-            return 'FREE 100MB'
+def recommend(df_input, mode='auto'):
+    """
+    Main recommendation system entry point.
 
-    elif row['user_segment'] == 'low':
-        if row['recharge_growth'] < 5000:
-            return 'Yolo Squad 1.5GB'
-        else:
-            return 'Gwamon 7GB + 30SMS'
+    Parameters:
+    - df_input: pandas DataFrame of user data
+    - mode: 'auto', 'single', 'multi', or 'direct'
 
-    elif row['user_segment'] == 'medium':
-        if row['increased_usage'] == 1:
-            return 'Yolo 2GB Daily at 5k'
-        else:
-            return 'MoMo Buy Danta Bundles'
+    Returns:
+    - DataFrame with prediction, segment, recommendation, and reason
+    """
+    # Automatically detect the input mode
+    if mode == 'auto':
+        mode = detect_input_mode(df_input)
 
-    elif row['user_segment'] == 'high':
-        if row['recharge_growth'] > 15000:
-            return 'MTN Irekure 30GB at 10k'
-        else:
-            return 'MTN MIFI'
+    if mode == 'single':
+        return handle_single_user(df_input)
 
-    return 'MTN Ihereze'  # default if nothing matches
+    elif mode == 'multi':
+        return handle_multi_user(df_input)
+
+    elif mode == 'direct':
+        return handle_direct_input(df_input)
+
+    else:
+        raise ValueError(f"Unsupported mode '{mode}'. Use 'single', 'multi', 'direct', or 'auto'.")
+
+def detect_input_mode(df):
+    """
+    Determines the input type: direct features or raw usage logs (single or multi user).
+    """
+    if {'avg_data_before_upgrade', 'std_before', 'total_recharge_before'}.issubset(df.columns):
+        return 'direct'
+    
+    if df['Phone Number'].nunique() == 1:
+        return 'single'
+
+    return 'multi'
+
+def handle_single_user(df_input):
+    pass
+
+def handle_multi_user(df_input):
+    pass
+
+def handle_direct_input(df_input): 
+    pass
