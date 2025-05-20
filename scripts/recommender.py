@@ -1,6 +1,6 @@
 import joblib
 import pandas as pd, numpy as np
-from offers import recommend_mtn_offer
+from .offers import recommend_mtn_offer
 
 # Load pre-trained models
 avg_model = joblib.load("../output/models/avg_data_xgb.pkl")
