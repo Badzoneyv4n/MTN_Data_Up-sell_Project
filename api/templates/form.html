@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>MTN Recommendation API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/8/8a/MTN_Logo.svg">
+    <style>
+        body {
+            background: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background: #fff;
+            max-width: 450px;
+            margin: 40px auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+            padding: 32px 32px 24px 32px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 90px;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        .toggle-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            background: #eee;
+            color: #222;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            border-radius: 8px 8px 0 0;
+            margin: 0 2px;
+        }
+
+        .toggle-btn.active {
+            background: #ffcc00;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 204, 0, 0.15);
+        }
+
+        .explanation {
+            background: #f9f9f9;
+            border-left: 4px solid #ffcc00;
+            padding: 10px 16px;
+            margin-bottom: 8px;
+            font-size: 0.98em;
+            text-align: left;
+        }
+
+        form {
+            margin-top: 18px;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 4px 0;
+            font-weight: 500;
+        }
+
+        input[type="number"],
+        input[type="file"] {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        input[type="submit"] {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: background 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            background: #ffe066;
+        }
+
+        .icon {
+            color: #ffcc00;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 98vw;
+                padding: 12px;
+            }
+        }
+
+        .logo {
+            width: 160px;
+            height: auto;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img class="logo" src="/static/mtn-seeklogo.png" alt="MTN Logo">
+        <h2><i class="fa-solid fa-bolt icon"></i>MTN Recommendation API</h2>
+        <div class="toggle-group">
+            <button id="usersBtn" class="toggle-btn active" type="button" onclick="showForm('users')">
+                <i class="fa-solid fa-users"></i> Users (CSV)
+            </button>
+            <button id="directBtn" class="toggle-btn" type="button" onclick="showForm('direct')">
+                <i class="fa-solid fa-user"></i> Direct Input
+            </button>
+        </div>
+        <div id="usersExplanation" class="explanation">
+            <b>Users (CSV):</b> Upload a CSV file containing multiple users' data. The API will process each user and
+            return recommendations for all users in the file.<br>
+            <b>Expected:</b> CSV file with columns:
+            <code>avg_data_before_upgrade, std_before, total_recharge_before, data_flag, std_flag, recharge_flag</code>.
+        </div>
+        <div id="directExplanation" class="explanation" style="display:none;">
+            <b>Direct Input:</b> Enter a single user's data manually. The API will return a recommendation for this user
+            only.<br>
+            <b>Expected:</b> Fill all fields below with the user's information.
+        </div>
+        <!-- Users (CSV) Form -->
+        <form id="usersForm" action="/users" enctype="multipart/form-data" method="post">
+            <label><i class="fa-solid fa-file-csv"></i> CSV File:</label>
+            <input type="file" name="file" accept=".csv" required>
+            <input type="submit" value="Get Recommendations">
+        </form>
+        <!-- Direct Input Form -->
+        <form id="directForm" action="/direct" method="post" style="display:none;">
+            <label>avg_data_before_upgrade:</label>
+            <input type="number" step="any" name="avg_data_before_upgrade" required>
+            <label>std_before:</label>
+            <input type="number" step="any" name="std_before" required>
+            <label>total_recharge_before:</label>
+            <input type="number" step="any" name="total_recharge_before" required>
+            <label>data_flag:</label>
+            <input type="number" name="data_flag" required>
+            <label>std_flag:</label>
+            <input type="number" name="std_flag" required>
+            <label>recharge_flag:</label>
+            <input type="number" name="recharge_flag" required>
+            <input type="submit" value="Get Recommendation">
+        </form>
+    </div>
+    <script>
+        function showForm(type) {
+            if (type === 'users') {
+                document.getElementById('usersForm').style.display = '';
+                document.getElementById('directForm').style.display = 'none';
+                document.getElementById('usersBtn').classList.add('active');
+                document.getElementById('directBtn').classList.remove('active');
+                document.getElementById('usersExplanation').style.display = '';
+                document.getElementById('directExplanation').style.display = 'none';
+            } else {
+                document.getElementById('usersForm').style.display = 'none';
+                document.getElementById('directForm').style.display = '';
+                document.getElementById('usersBtn').classList.remove('active');
+                document.getElementById('directBtn').classList.add('active');
+                document.getElementById('usersExplanation').style.display = 'none';
+                document.getElementById('directExplanation').style.display = '';
+            }
+        }
+    </script>
+</body>
+
+</html>
