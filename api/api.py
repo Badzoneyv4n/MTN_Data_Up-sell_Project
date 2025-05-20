@@ -10,7 +10,9 @@ from io import StringIO
 # Add the parent directory's 'scripts' folder to the Python path
 sys.path.append(os.path.abspath('../scripts'))
 
-from recommender import recommend
+# from recommender import recommend
+
+from scripts.recommender import recommend
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
